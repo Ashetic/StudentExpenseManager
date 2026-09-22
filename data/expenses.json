@@ -1,0 +1,37 @@
+[
+    {
+        "expense_id": 1,
+        "amount": 500.0,
+        "category": "Food",
+        "description": "Lunch",
+        "date": "20-09-2026"
+    },
+    {
+        "expense_id": 2,
+        "amount": 1000.0,
+        "category": "Transport",
+        "description": "Bus pass",
+        "date": "21-09-2026"
+    },
+    {
+        "expense_id": 3,
+        "amount": 1500.0,
+        "category": "Food",
+        "description": "Groceries",
+        "date": "22-09-2026"
+    },
+    {
+        "expense_id": 4,
+        "amount": 2000.0,
+        "category": "Education",
+        "description": "Books",
+        "date": "23-09-2026"
+    },
+    {
+        "expense_id": 5,
+        "amount": 150.0,
+        "category": "Food",
+        "description": "Lunch",
+        "date": "23-09-2026"
+    }
+]

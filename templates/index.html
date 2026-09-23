@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ app_name }}</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="header">
+
+    <div>
+        <h1>{{ app_name }}</h1>
+        <p>Version {{ version }}</p>
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    {% if message %}
+
+    <div class="message {{ message_type }}">
+        {{ message }}
+    </div>
+
+    {% endif %}
+
+
+    <!-- DASHBOARD -->
+
+    <section class="dashboard">
+
+        <div class="card">
+
+            <h3>Total Spending</h3>
+
+            <p class="big-number">
+                ₹{{ "%.2f"|format(total_spending) }}
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Total Expenses</h3>
+
+            <p class="big-number">
+                {{ expenses|length }}
+            </p>
+
+        </div>
+
+        {% if budget_month %}
+
+        <div class="card">
+
+            <h3>Monthly Budget</h3>
+
+            <p class="big-number">
+                ₹{{ "%.2f"|format(budget_amount) }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- ADD EXPENSE -->
+
+    <section class="section">
+
+        <h2>Add Expense</h2>
+
+        <form
+            action="{{ url_for('add_expense') }}"
+            method="POST"
+            class="form-grid"
+        >
+
+            <div>
+
+                <label>Amount</label>
+
+                <input
+                    type="number"
+                    name="amount"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Example: 150"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Category</label>
+
+                <input
+                    type="text"
+                    name="category"
+                    placeholder="Food"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Description</label>
+
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Lunch"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Date</label>
+
+                <input
+                    type="text"
+                    name="date"
+                    placeholder="DD-MM-YYYY"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Add Expense
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- SEARCH -->
+
+    <section class="section">
+
+        <h2>Search Expenses</h2>
+
+        <form
+            action="{{ url_for('search') }}"
+            method="GET"
+            class="search-form"
+        >
+
+            <input
+                type="text"
+                name="keyword"
+                placeholder="Search category, description or date"
+                value="{{ search_keyword|default('') }}"
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+            <a
+                href="{{ url_for('home') }}"
+                class="button secondary"
+            >
+                Clear
+            </a>
+
+        </form>
+
+    </section>
+
+
+    <!-- EXPENSE LIST -->
+
+    <section class="section">
+
+        <h2>Expenses</h2>
+
+        {% if expenses %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for expense in expenses %}
+
+                    <tr>
+
+                        <td>
+                            {{ expense.expense_id }}
+                        </td>
+
+                        <td>
+                            ₹{{ "%.2f"|format(expense.amount) }}
+                        </td>
+
+                        <td>
+                            {{ expense.category }}
+                        </td>
+
+                        <td>
+                            {{ expense.description }}
+                        </td>
+
+                        <td>
+                            {{ expense.date }}
+                        </td>
+
+                        <td>
+
+                            <form
+                                action="{{ url_for('delete_expense', expense_id=expense.expense_id) }}"
+                                method="POST"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="delete-button"
+                                    onclick="return confirm('Delete this expense?');"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p class="empty">
+            No expenses found.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- MONTHLY BUDGET -->
+
+    <section class="section">
+
+        <h2>Monthly Budget</h2>
+
+        <form
+            action="{{ url_for('set_budget') }}"
+            method="POST"
+            class="form-grid"
+        >
+
+            <div>
+
+                <label>Month</label>
+
+                <input
+                    type="text"
+                    name="month"
+                    placeholder="MM-YYYY"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Budget Amount</label>
+
+                <input
+                    type="number"
+                    name="budget_amount"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Example: 5000"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Set Budget
+            </button>
+
+        </form>
+
+
+        <form
+            action="{{ url_for('budget_status') }}"
+            method="GET"
+            class="search-form budget-form"
+        >
+
+            <input
+                type="text"
+                name="month"
+                placeholder="MM-YYYY"
+                required
+            >
+
+            <button type="submit">
+                View Budget Status
+            </button>
+
+        </form>
+
+
+        {% if budget_month %}
+
+        <div class="budget-result">
+
+            <h3>
+                Budget Status — {{ budget_month }}
+            </h3>
+
+            <p>
+                Budget:
+                <strong>
+                    ₹{{ "%.2f"|format(budget_amount) }}
+                </strong>
+            </p>
+
+            <p>
+                Monthly Spending:
+                <strong>
+                    ₹{{ "%.2f"|format(monthly_total) }}
+                </strong>
+            </p>
+
+            <p>
+                Remaining:
+                <strong>
+                    ₹{{ "%.2f"|format(remaining) }}
+                </strong>
+            </p>
+
+            <p>
+                Used:
+                <strong>
+                    {{ "%.2f"|format(percentage) }}%
+                </strong>
+            </p>
+
+            <p class="status">
+                {{ status }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- REPORTS -->
+
+    <section class="section">
+
+        <h2>Expense Reports</h2>
+
+        <form
+            action="{{ url_for('reports') }}"
+            method="GET"
+            class="search-form"
+        >
+
+            <input
+                type="text"
+                name="month"
+                placeholder="MM-YYYY (leave empty for all time)"
+            >
+
+            <button type="submit">
+                Generate Report
+            </button>
+
+        </form>
+
+
+        {% if report_month %}
+
+        <div class="report">
+
+            <h3>
+                Report: {{ report_month }}
+            </h3>
+
+            <div class="report-grid">
+
+                <div class="report-card">
+
+                    <span>Total</span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(report_total) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-card">
+
+                    <span>Average</span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(average) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-card">
+
+                    <span>Highest</span>
+
+                    <strong>
+
+                        {% if highest %}
+                        ₹{{ "%.2f"|format(highest.amount) }}
+                        {% else %}
+                        ₹0.00
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="report-card">
+
+                    <span>Lowest</span>
+
+                    <strong>
+
+                        {% if lowest %}
+                        ₹{{ "%.2f"|format(lowest.amount) }}
+                        {% else %}
+                        ₹0.00
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <h3>Category Breakdown</h3>
+
+            {% if category_totals %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Percentage</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for category, amount in category_totals.items() %}
+
+                    <tr>
+
+                        <td>
+                            {{ category }}
+                        </td>
+
+                        <td>
+                            ₹{{ "%.2f"|format(amount) }}
+                        </td>
+
+                        <td>
+                            {{ "%.2f"|format(category_percentages[category]) }}%
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <p class="empty">
+                No report data available.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <p>
+        {{ app_name }} | Python Project
+    </p>
+
+</footer>
+
+</body>
+
+</html>

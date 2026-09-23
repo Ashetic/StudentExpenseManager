@@ -186,3 +186,13 @@ StudentExpenseManager/
     ├── test_search.py
     └── test_report.py
     
+    ## Web Application
+
+The Student Expense & Budget Management System also includes a Flask-based web interface.
+
+### Start the Web Application
+
+Install the required dependencies:
+
+```bash
+python -m pip install -r requirements.txt
